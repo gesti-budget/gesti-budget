@@ -211,3 +211,112 @@ install(FILES
 #Themes & GRM
 install(FILES ${THEMEFILES} DESTINATION ${GBEX_RES_DIR_THEMES})
 install(FILES ${GRMFILES} DESTINATION ${GBEX_RES_DIR_REPORTS})
+
+
+# Si on est sous Linux
+if(LINUX)
+    # === Installation des fichiers spécifiques Linux ===
+
+    # 1️⃣ Installer le fichier .desktop (raccourci d'application dans le menu)
+    install(FILES
+        resources/dist/linux/share/applications/org.moneymanagerex.MMEX.desktop
+        DESTINATION share/applications)
+
+    # 2️⃣ Installer le fichier XML de définition MIME (pour associer des types de fichiers à l’application)
+    install(FILES
+        resources/dist/linux/share/mime/packages/org.moneymanagerex.MMEX.mime.xml
+        DESTINATION share/mime/packages)
+
+    # === Détermination de la version d’AppStream installée ===
+    execute_process(
+        COMMAND appstreamcli --version                 # Exécute la commande pour obtenir la version
+        OUTPUT_VARIABLE APPSTREAM_VERSION              # Stocke la sortie dans une variable
+        OUTPUT_STRIP_TRAILING_WHITESPACE)               # Supprime les espaces/retours inutiles
+
+    # Nettoyer la sortie pour ne garder que le numéro de version
+    string(REPLACE "AppStream version: " "" APPSTREAM_VERSION ${APPSTREAM_VERSION})
+
+    # Extraire les parties majeure, mineure, patch via une expression régulière
+    string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)" APPSTREAM_VERSION_MATCH "${APPSTREAM_VERSION}")
+    set(APPSTREAM_MAJOR_VERSION ${CMAKE_MATCH_1})
+    set(APPSTREAM_MINOR_VERSION ${CMAKE_MATCH_2})
+    set(APPSTREAM_PATCH_VERSION ${CMAKE_MATCH_3})
+
+    # === Gestion des cas selon la version d’AppStream ===
+
+    # 📌 Cas 1 : Version < 0.12.9 → pas de fonction "news-to-metainfo"
+    if(APPSTREAM_MAJOR_VERSION EQUAL 0 AND (APPSTREAM_MINOR_VERSION LESS 12 OR (APPSTREAM_MINOR_VERSION EQUAL 12 AND APPSTREAM_PATCH_VERSION LESS 9)))
+        message(STATUS "AppStream version ${APPSTREAM_VERSION} < 0.12.9. On saute l'intégration de NEWS dans Metainfo.")
+        execute_process(COMMAND cp ${PROJECT_SOURCE_DIR}/resources/dist/linux/share/metainfo/org.moneymanagerex.MMEX.metainfo.xml.in org.moneymanagerex.MMEX.metainfo.xml)
+
+    # 📌 Cas 2 : Version < 0.14.6 → bug connu sur la section "Miscellaneous" → fusionner avec "Bugfix"
+    elseif(APPSTREAM_MAJOR_VERSION EQUAL 0 AND (APPSTREAM_MINOR_VERSION LESS 14 OR (APPSTREAM_MINOR_VERSION EQUAL 14 AND APPSTREAM_PATCH_VERSION LESS 6)))
+        message(STATUS "AppStream version ${APPSTREAM_VERSION} < 0.14.6. Fusion de 'Miscellaneous' dans la section 'Bugfix' de NEWS.")
+        execute_process(COMMAND cp ${CMAKE_SOURCE_DIR}/NEWS ${CMAKE_BINARY_DIR}/NEWS)
+        execute_process(COMMAND sed -i -e ":a;N;$!ba;s/\\n\\nMiscellaneous://g" ${CMAKE_BINARY_DIR}/NEWS)
+        execute_process(COMMAND appstreamcli news-to-metainfo --format=markdown ${CMAKE_BINARY_DIR}/NEWS ${PROJECT_SOURCE_DIR}/resources/dist/linux/share/metainfo/org.moneymanagerex.MMEX.metainfo.xml.in org.moneymanagerex.MMEX.metainfo.xml
+                RESULT_VARIABLE cmd_result)
+        if(cmd_result)
+            message(FATAL_ERROR "appstreamcli news-to-metainfo a renvoyé ${cmd_result}")
+        endif()
+
+    # 📌 Cas 3 : Version >= 0.14.6 → traitement normal
+    else()
+        message(STATUS "AppStream version ${APPSTREAM_VERSION}")
+        execute_process(COMMAND appstreamcli news-to-metainfo --format=markdown ${PROJECT_SOURCE_DIR}/NEWS ${PROJECT_SOURCE_DIR}/resources/dist/linux/share/metainfo/org.moneymanagerex.MMEX.metainfo.xml.in org.moneymanagerex.MMEX.metainfo.xml
+                COMMAND_ERROR_IS_FATAL ANY)
+    endif()
+
+    # === Nettoyage du fichier metainfo : suppression du tag <developer_name> ===
+    execute_process(COMMAND sed -i -e "s/<developer_name>.*<\\/developer_name>//g" org.moneymanagerex.MMEX.metainfo.xml)
+
+    # === Validation stricte du fichier metainfo selon la version d’AppStream ===
+
+    # 📌 Cas : version >= 0.15.4 → validation stricte
+    if(APPSTREAM_MAJOR_VERSION GREATER 0 OR (APPSTREAM_MINOR_VERSION GREATER 15 OR (APPSTREAM_MINOR_VERSION EQUAL 15 AND APPSTREAM_PATCH_VERSION GREATER_EQUAL 4)))
+        execute_process(COMMAND appstreamcli validate --strict --no-net org.moneymanagerex.MMEX.metainfo.xml
+                COMMAND_ERROR_IS_FATAL ANY)
+
+    # 📌 Cas : version >= 0.12.3 → validation simple (pas stricte)
+    elseif(APPSTREAM_MINOR_VERSION GREATER 12 OR (APPSTREAM_MINOR_VERSION EQUAL 12 AND APPSTREAM_PATCH_VERSION GREATER_EQUAL 3))
+        execute_process(COMMAND appstreamcli validate --no-net org.moneymanagerex.MMEX.metainfo.xml RESULT_VARIABLE cmd_result)
+        if(cmd_result)
+            message(FATAL_ERROR "appstreamcli validate a renvoyé ${cmd_result}")
+        endif()
+
+    # 📌 Cas : version < 0.12.3 → validation sautée
+    else()
+        message(STATUS "AppStream version ${APPSTREAM_VERSION} < 0.12.3. Validation du metainfo ignorée.")
+    endif()
+
+    # === Installation du fichier metainfo final ===
+    install(FILES
+        ${CMAKE_BINARY_DIR}/org.moneymanagerex.MMEX.metainfo.xml
+        DESTINATION share/metainfo)
+endif()
+
+
+# Icons
+if(LINUX)
+    install(FILES
+        resources/mmex.svg
+        DESTINATION share/icons/hicolor/scalable/apps RENAME org.moneymanagerex.MMEX.svg)
+elseif(APPLE)
+    install(FILES
+        "${MACOSX_APP_ICON_FILE}"
+        DESTINATION "${GBEX_RES_DIR}")
+elseif(WIN32)
+    install(FILES
+        resources/mmex.ico
+        DESTINATION "${GBEX_RES_DIR}")
+endif()
+
+# libcurl for Windows, if specified and exists then copy to bin
+if(CMAKE_PREFIX_PATH)
+    file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}/bin/libcurl.dll" CURL_LIBPATH)
+    if(EXISTS "${CURL_LIBPATH}")
+        install(FILES
+            "${CURL_LIBPATH}"
+            DESTINATION "${GBEX_BIN_DIR}")
+    endif()
+endif()

@@ -99,7 +99,7 @@ endif()
 include(install)
 
 # 📦 Configuration de CPack pour la création de paquets multiplateformes 
-#include(CPackSetup)
+include(CPackSetup)
 
 # TODO: Ajoutez des tests et installez des cibles si nécessaire.
 

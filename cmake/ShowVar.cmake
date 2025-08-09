@@ -92,4 +92,16 @@ message(STATUS "gettext ${GETTEXT_VERSION_STRING}")
 
 message(STATUS "Répertoire Documentation GBEX: ${GBEX_DOC_DIR}")
 message(STATUS "Répertoire Ressources GBEX: ${GBEX_RES_DIR}")
+
+
+message(STATUS "")
+message(STATUS "Variables CPACK")
+message(STATUS "--========--")
+get_cmake_property(_vars VARIABLES)
+foreach(_var ${_vars})
+    if(_var MATCHES "^CPACK_")
+        message(STATUS "${_var} = ${${_var}}")
+    endif()
+endforeach()
+
 message(STATUS "------------------ 8< -----------------")
