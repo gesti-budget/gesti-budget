@@ -1,0 +1,31 @@
+//----------------------------------------------------------------------------
+// ⚠️ AVERTISSEMENT : Ce fichier versions.h est généré automatiquement par CMake.
+//                    Si vous souhaitez y apporter des modifications,
+//                    veuillez éditer le fichier modèle versions.h.in,
+//                    puis relancez CMake pour régénérer une version mise à jour
+//                    de versions.h.
+//
+// Remarque : Les changements de version de GBEX doivent être effectués
+//            dans le fichier CMakeLists.txt principal.
+//----------------------------------------------------------------------------
+
+
+#define GBEX_VERSION_MAJOR @GBEX_VERSION_MAJOR@
+#define GBEX_VERSION_MINOR @GBEX_VERSION_MINOR@
+#define GBEX_VERSION_PATCH @GBEX_VERSION_PATCH@
+#define GBEX_VERSION_ALPHA @GBEX_VERSION_ALPHA@
+#define GBEX_VERSION_BETA  @GBEX_VERSION_BETA@
+#define GBEX_VERSION_RC    @GBEX_VERSION_RC@
+
+#cmakedefine GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
+#cmakedefine GIT_COMMIT_DATE "@GIT_COMMIT_DATE@"
+#cmakedefine GIT_BRANCH      "@GIT_BRANCH@"
+
+#define CMAKE_VERSION   "CMake @CMAKE_VERSION@"
+#define CMAKE_GENERATOR "@CMAKE_GENERATOR@"
+#define MAKE_VERSION    "@CMAKE_MAKE_VERSION@"
+#define GETTEXT_VERSION "gettext @GETTEXT_VERSION_STRING@"
+#define CXX_VERSION     "@CMAKE_CXX_COMPILER_VERSION@"
+#cmakedefine VS_VERSION "@VS_VERSION@"
+#cmakedefine CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION "Windows SDK @CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION@"
+#cmakedefine LINUX_DISTRO_STRING "@LINUX_DISTRO_STRING@"
