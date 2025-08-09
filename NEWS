@@ -12,6 +12,11 @@ soit sur, c'est pour celà que je pousse cette version RC 3 petit à petit.
 ** Ajout du module "ShowVar" pour afficher un retour de la configuration
 ** Ajout du module "VcpkgSetup" pour la détection et intégration automatique de vcpkg
 ** Ajout du module "Version" pour la gestion de la version du projet"
+** Ajout du module "GitInfo" pour la gestion des informations de version du dépôt Git
+** Ajout du module "BuildHeader" afin de générer un fichier d'en-tête avec les informations de version
+
+Mise en place d'un fichier CMakeLists.txt dans le dossier src, ainsi j'ai pur dépoter les sources"
+
 
 Version 1.9.2 RC 2
 ~~~~~~~~~~~~~~~~~~~~

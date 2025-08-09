@@ -28,6 +28,10 @@ include(Version)
 # 📦 Détection de vcpkg et configuration du toolchain
 include(VcpkgSetup)
 
+
+# === Configuration du format de debug pour Visual Studio (MSVC) ===
+# Si la politique CMP0141 (CMake ≥ 3.28) est disponible,
+# active le support du rechargement à chaud (Edit & Continue) pour MSVC en Debug.
 # Activez Rechargement à chaud pour les compilateurs MSVC si cela est pris en charge.
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
@@ -42,12 +46,15 @@ option(GBEX_ENCRYPTION_OPTIONAL "Compiler même si la bibliothèque wxsqlite ne 
 
 # Nom du fichier exécutable généré
 set(GBEX_EXE gbex)
-# Ajoutez une source à l'exécutable de ce projet.
-add_executable (${GBEX_EXE} "gesti-budget.cpp" "gesti-budget.h")
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET ${GBEX_EXE} PROPERTY CXX_STANDARD 20)
-endif()
+# 📝 Génération du fichier build.h (version + date/heure de build)
+include(BuildHeader)
+
+# 🎯 Récupération des infos Git (branche, commit, date)
+include(GitInfo)
+
+add_subdirectory(src)
+
 
 # TODO: Ajoutez des tests et installez des cibles si nécessaire.
 
