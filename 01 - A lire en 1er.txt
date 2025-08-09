@@ -1,0 +1,36 @@
+Ce fichier représente l'architecture des dossiers que je t'ai envoyé
+Chaque fichier à été nommé de façon à imaginé qu'il y a des réperoire
+Ex: orig.CMakeLists.txt se trouve être en faite orig/CMakeLists.txt
+
+Voici l'arborescence
+├── orig /  								    : Dossier contenant le dépôt d'origine de Money Manager EX
+|     ├── src /		 						    : Dossier contenant les sources du projet d'origine
+|     |     ├── CMakeLists.txt 				    : Fichier de configuration des sources du dépôt d'origine
+|     |     ├── ressource.h 				    : info à définir
+|     ├── CMakeLists.txt 					    : Fichier de configuration du projet principal du dépôt d'origine
+|
+└── new 	 								    : Dossier contenant le nouveau dépôt que j'ai créer pour décortiquer le code d'origine
+      ├──  cmake							    : Dossier répertoriant les modules cmake inclus dans le fichier CMakeLists.txt
+      |     ├── Version.cmake                   : Gestion des versions (NEWS, suffixe instable)
+      |     ├── GitInfo.cmake                   : Extraction des infos Git (branche, commit, date)
+      |     ├── VcpkgSetup.cmake                : Détection et intégration automatique de vcpkg
+      |     ├── BuildHeader.cmake               : Génération du build.h
+      |     ├── LinuxDetection.cmake            : Détection OS/distro Linux
+      |     ├── CompilerSetup.cmake             : Configuration du compilateur et des outils de cache
+      |     ├── CacheTool.cmake                 : Configuration du cache de compilation (ccache/clcache)
+      |     ├── PlatformPaths.cmake	            : Définition des chemins de ressources selon la plateforme
+      |     ├── GraphVizExport.cmake            : Options pour l'export Graphviz des dépendances
+      |     ├── WxWidgetsSetup.cmake            : Configuration de wxWidgets (si nécessaire)
+      |     ├── CurlSetup.cmake                 : Configuration de la dépendance CURL/libcurl
+      |     ├── BuildLayout.cmake               : Configuration des chemins de build et ressources
+      |     ├── PackagingSetup.cmake            : Configuration de l'archivage et packaging
+      |     ├── CPackSetup.cmake                : Configuration de CPack pour les paquets multiplateformes
+      |     └── install.cmake                   : Installation des fichiers générés (build.h, etc.)
+      ├── src /								    : Dossier contenant les sources du projet
+      |     ├── build.h     			        : Fichier généré contenant les informations de build
+      |     ├── CMakeLists.txt                  : Fichier de configuration des sources du nouveau dépôt
+      |     ├── ressource.h                     : info à définir
+      |     ├── gesti-budget.cpp                : Fichier source principal du projet
+      |     ├── gesti-budget.h 			        : Fichier d'en-tête principal du projet
+      ├── CMakeLists.txt                        : Fichier de configuration du projet principal du nouveau dépôt
+      ├── CMakePresets.json                     : Fichier de configuration des presets CMake pour le nouveau dépôt

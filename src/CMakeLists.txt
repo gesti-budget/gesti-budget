@@ -14,6 +14,19 @@ unset(m_hasParent)
 include(CheckCXXCompilerFlag)
 
 
+if(MSVC)
+    check_cxx_compiler_flag(/utf-8 MSVC_UFT8_CXX_FLAG)
+    if(MSVC_UFT8_CXX_FLAG)
+        add_compile_options(/utf-8)
+    else()
+        file(GENERATE
+            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/msvc_build_header_$<CONFIG>.h
+            CONTENT "#pragma execution_character_set(\"utf-8\")"
+        )
+        add_compile_options(/FI"${CMAKE_CURRENT_BINARY_DIR}/msvc_build_header_$<CONFIG>.h")
+    endif()
+endif()
+
 # Ajoutez une source à l'exécutable de ce projet.
 add_executable (${GBEX_EXE} "gesti-budget.cpp" "gesti-budget.h")
 

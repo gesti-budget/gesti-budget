@@ -53,6 +53,25 @@ include(BuildHeader)
 # 🎯 Récupération des infos Git (branche, commit, date)
 include(GitInfo)
 
+
+# 🐧 Détection de la distribution Linux (via lsb_release, etc.)
+include(LinuxDetection)
+
+# ⚙️ Configuration du compilateur (C++17/23, flags MSVC, AppleClang, etc.)
+include(CompilerSetup)
+
+# 🚀 Détection et configuration d’un outil de cache de compilation
+include(CacheTool)
+
+# 📊 Configuration pour l’export des dépendances au format Graphviz
+include(GraphVizExport)
+
+# 🧱 Définition des chemins vers ressources/doc selon la plateforme
+include(PlatformPaths)
+
+# 📚 Chargement de la dépendance wxWidgets
+include(WxWidgetsSetup)
+
 add_subdirectory(src)
 
 
