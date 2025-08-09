@@ -72,8 +72,34 @@ include(PlatformPaths)
 # 📚 Chargement de la dépendance wxWidgets
 include(WxWidgetsSetup)
 
+
+# 🌐 Chargement de la dépendance libcurl (avec fallback avancé)
+include(CurlSetup)
+
+
+add_subdirectory(3rd/fmt)
+
+# 📦 Mise en place de l’arborescence de build et des répertoires d’installation
+include(BuildLayout)
+
+## Inclusion des sous-dossiers qui déclarent des cibles (executables, bibliothèques) ##
+add_subdirectory(3rd)
+add_subdirectory(po)
 add_subdirectory(src)
 
+# 📦 Génération des packages de thèmes et rapports (zip .mmextheme/.grm)
+include(PackagingSetup)
+
+## Tuning for VisualStudio IDE ##
+if(NOT CMAKE_VERSION VERSION_LESS 3.6)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${GBEX_EXE})
+endif()
+
+# 📦 Configuration de l'installation des fichiers générés et des ressources
+include(install)
+
+# 📦 Configuration de CPack pour la création de paquets multiplateformes 
+#include(CPackSetup)
 
 # TODO: Ajoutez des tests et installez des cibles si nécessaire.
 

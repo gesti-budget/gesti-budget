@@ -29,15 +29,15 @@ if(APPLE)
 
 elseif(WIN32)
     # 🪟 Windows : structure simplifiée dans le même dossier que l'exécutable
-    set(MMEX_DOC_DIR .)
-    set(MMEX_RES_DIR res)
+    set(GBEX_DOC_DIR docs)
+    set(GBEX_RES_DIR res)
 
 else()
     # 🐧 Linux ou autres Unix : structure de type FHS (Filesystem Hierarchy Standard)
-    set(MMEX_DOC_DIR share/doc/mmex)
-    set(MMEX_RES_DIR share/mmex/res)
+    set(GBEX_DOC_DIR share/doc/mmex)
+    set(GBEX_RES_DIR share/mmex/res)
 endif()
 
 # 🔗 Définition des sous-dossiers standards pour les ressources
-set(MMEX_RES_DIR_THEMES "${MMEX_RES_DIR}/themes")    # thèmes UI
-set(MMEX_RES_DIR_REPORTS "${MMEX_RES_DIR}/reports")  # rapports HTML
+set(GBEX_RES_DIR_THEMES "${GBEX_RES_DIR}/themes")    # thèmes UI
+set(GBEX_RES_DIR_REPORTS "${GBEX_RES_DIR}/reports")  # rapports HTML

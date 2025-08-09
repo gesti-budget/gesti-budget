@@ -89,4 +89,7 @@ if(CURL_VERSION)
     message(STATUS "curl ${CURL_VERSION}")
 endif()
 message(STATUS "gettext ${GETTEXT_VERSION_STRING}")
+
+message(STATUS "Répertoire Documentation GBEX: ${GBEX_DOC_DIR}")
+message(STATUS "Répertoire Ressources GBEX: ${GBEX_RES_DIR}")
 message(STATUS "------------------ 8< -----------------")

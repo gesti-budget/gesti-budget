@@ -28,8 +28,4 @@ if(MSVC)
 endif()
 
 # Ajoutez une source à l'exécutable de ce projet.
-add_executable (${GBEX_EXE} "gesti-budget.cpp" "gesti-budget.h")
-
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET ${GBEX_EXE} PROPERTY CXX_STANDARD 20)
-endif()
+add_executable (${GBEX_EXE} gesti-budget.cpp "gesti-budget.h")
