@@ -114,3 +114,95 @@ add_executable (${GBEX_EXE} WIN32
     winmain.cpp 
     winmain.h
     "${GBEX_RC}")
+
+# === ⚠️ Vérifie la version minimale de Visual Studio ===
+#
+# MSVC_VERSION < 1800 = Visual Studio 2012 ou antérieur → incompatible
+# C++11 est requis dans ce projet, donc VS2013 (v1800) est la base minimale.
+
+if(MSVC AND MSVC_VERSION LESS 1800)
+    message(SEND_ERROR "MSVC version too old. Please use VS2013 (12.0) or later for required C++11 features.")
+endif()
+
+# === 📦 Détection automatique du support C++11 avec target_compile_features ===
+#
+# CMake ≥3.1 permet de détecter les fonctionnalités standard C++ supportées par le compilateur
+# et de les appliquer proprement à une cible.
+
+if(";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_std_11;")
+    # Si le compilateur supporte officiellement C++11, on l’active sur la cible
+    target_compile_features(${GBEX_EXE} PUBLIC cxx_std_11)
+
+elseif(
+    ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_range_for;"
+    AND ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_nullptr;"
+    AND ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_variadic_templates;"
+)
+    # Fallback : le compilateur ne supporte pas `cxx_std_11` officiellement,
+    # mais supporte les 3 features clés de C++11 (suffisant pour MMEX)
+    target_compile_features(${GBEX_EXE} PUBLIC
+        cxx_range_for cxx_nullptr cxx_variadic_templates)
+
+else()
+    # === 🛠️ Détection manuelle du support C++11 via des flags de compilation ===
+    #
+    # Pour les anciens CMake/compilateurs qui ne gèrent pas `target_compile_features`
+    # On teste les drapeaux manuellement (gnu++11, c++11, gnu++0x, etc.)
+    CHECK_CXX_COMPILER_FLAG("-std=gnu++11" COMPILER_SUPPORTS_GXX11)
+    CHECK_CXX_COMPILER_FLAG("-std=c++11"   COMPILER_SUPPORTS_CXX11)
+    CHECK_CXX_COMPILER_FLAG("-std=gnu++0x" COMPILER_SUPPORTS_GXX0X)
+    CHECK_CXX_COMPILER_FLAG("-std=c++0x"   COMPILER_SUPPORTS_CXX0X)
+
+    # Applique le premier flag trouvé parmi les options testées
+    if(COMPILER_SUPPORTS_GXX11)
+        target_compile_options(${MMEX_EXE} PUBLIC -std=gnu++11)
+    elseif(COMPILER_SUPPORTS_CXX11)
+        target_compile_options(${MMEX_EXE} PUBLIC -std=c++11)
+    elseif(COMPILER_SUPPORTS_GXX0X)
+        target_compile_options(${MMEX_EXE} PUBLIC -std=gnu++0x)
+    elseif(COMPILER_SUPPORTS_CXX0X)
+        target_compile_options(${MMEX_EXE} PUBLIC -std=c++0x)
+    else()
+        # Aucun support C++11 trouvé → on stoppe avec une erreur
+        message(SEND_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support.")
+    endif()
+endif()
+
+# === 🔗 Chemins d’inclusion pour les headers de MMEX ===
+#
+# Ajoute les dossiers courants, model/ et db/ à la recherche des includes
+#target_include_directories(${GBEX_EXE} PUBLIC . model db)
+target_include_directories(${GBEX_EXE} PUBLIC . )
+
+# === 🔗 Dépendances à l’édition de lien ===
+#
+# Cette ligne relie le binaire principal à toutes les bibliothèques nécessaires
+
+target_link_libraries(${GBEX_EXE} PUBLIC
+    wxSQLite3         # Wrapper wxWidgets pour SQLite
+    #RapidJSON         # Librairie JSON rapide en header-only
+    #HTML-template     # Système de template HTML de MMEX
+    #CURL::libcurl     # Librairie cURL pour HTTP, FTP, etc.
+    #fmt               # Librairie de formatage moderne (comme Python f"")
+    #LuaGlue           # Binding entre C++ et Lua
+    #Lua               # Interpréteur Lua pur (liblua)
+)
+
+# === 🔧 Fix spécifique à MSVC (Windows) ===
+#
+# Permet de réduire les conflits entre winsock.h et winsock2.h
+# et d’alléger l’inclusion des headers Windows (WIN32_LEAN_AND_MEAN)
+if(MSVC)
+    target_compile_definitions(${GBEX_EXE} PRIVATE WIN32_LEAN_AND_MEAN)
+endif()
+
+# === 📦 Installation du binaire généré ===
+#
+# Définit ce qui est installé avec `make install` ou `cmake --install`
+# - RUNTIME : pour Windows/Linux → l'exécutable
+# - BUNDLE  : pour macOS (.app)
+
+install(TARGETS ${GBEX_EXE}
+    RUNTIME DESTINATION ${GBEX_BIN_DIR}
+    BUNDLE  DESTINATION .
+)

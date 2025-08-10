@@ -1,4 +1,4 @@
-// #include "wx/msw/wx.rc"
+#include "wx/msw/wx.rc"
 
 // Microsoft Visual C++ generated resource script.
 //
@@ -11,8 +11,8 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 	#ifdef _WIN32
 		#ifndef __GNUWIN32__  // Greg Newton
-			//LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-			LANGUAGE 0x09, 0x01
+			LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+			//LANGUAGE 0x09, 0x01
 		#endif
 		#pragma code_page(1252)
 	#endif
